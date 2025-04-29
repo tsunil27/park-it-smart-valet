@@ -26,7 +26,9 @@ const LoginPage: React.FC = () => {
       if (success) {
         // Login successful - redirect based on role
         const role = email.includes('admin') ? 'admin' : 
-                     email.includes('attendant') ? 'admin' : 'customer';
+                     email.includes('attendant') ? 'attendant' : 'customer';
+        
+        // Fix for comparison error - redirect to admin dashboard for both admin and attendant roles
         navigate(role === 'admin' || role === 'attendant' ? '/admin' : '/customer');
       }
     } finally {

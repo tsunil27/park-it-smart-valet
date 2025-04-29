@@ -68,7 +68,9 @@ const AdminDashboard: React.FC = () => {
     // If retrieved, update parking spot status
     if (newStatus === 'retrieved' && vehicle.parkingSpot) {
       const updatedSpots = parkingSpots.map(spot => 
-        spot.id === vehicle.parkingSpot ? { ...spot, status: 'available', vehicleId: undefined } : spot
+        spot.id === vehicle.parkingSpot 
+          ? { ...spot, status: 'available' as const, vehicleId: undefined } 
+          : spot
       );
       setParkingSpots(updatedSpots);
     }
@@ -93,7 +95,9 @@ const AdminDashboard: React.FC = () => {
     // Update parking spot
     if (vehicleData.parkingSpot) {
       const updatedSpots = parkingSpots.map(spot => 
-        spot.id === vehicleData.parkingSpot ? { ...spot, status: 'occupied', vehicleId: newVehicle.id } : spot
+        spot.id === vehicleData.parkingSpot 
+          ? { ...spot, status: 'occupied' as const, vehicleId: newVehicle.id } 
+          : spot
       );
       setParkingSpots(updatedSpots);
     }
@@ -104,13 +108,17 @@ const AdminDashboard: React.FC = () => {
   const handleProcessRequest = (request: RetrievalRequest) => {
     // Update request status
     const updatedRequests = retrievalRequests.map(req => 
-      req.id === request.id ? { ...req, status: 'processing' } : req
+      req.id === request.id 
+        ? { ...req, status: 'processing' as const } 
+        : req
     );
     setRetrievalRequests(updatedRequests);
 
     // Update vehicle status
     const updatedVehicles = vehicles.map(v => 
-      v.id === request.vehicleId ? { ...v, status: 'pending-retrieval' } : v
+      v.id === request.vehicleId 
+        ? { ...v, status: 'pending-retrieval' as const } 
+        : v
     );
     setVehicles(updatedVehicles);
   };
