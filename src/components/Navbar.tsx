@@ -29,13 +29,7 @@ const Navbar: React.FC = () => {
                       </Button>
                     </Link>
                   </div>
-                ) : (
-                  <Link to="/customer">
-                    <Button variant={location.pathname.includes('/customer') ? "secondary" : "ghost"}>
-                      My Vehicle
-                    </Button>
-                  </Link>
-                )}
+                ) : null}
                 
                 <span className="text-sm hidden md:inline">Welcome, {user?.name}</span>
                 <Button variant="outline" size="sm" onClick={logout}>
@@ -44,9 +38,14 @@ const Navbar: React.FC = () => {
               </>
             ) : (
               <div className="flex space-x-2">
+                <Link to="/retrieve">
+                  <Button variant="outline" size="sm">
+                    Retrieve Vehicle
+                  </Button>
+                </Link>
                 <Link to="/login">
                   <Button variant="outline" size="sm">
-                    Login
+                    Staff Login
                   </Button>
                 </Link>
               </div>

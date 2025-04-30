@@ -28,8 +28,8 @@ const LoginPage: React.FC = () => {
         const role = email.includes('admin') ? 'admin' : 
                      email.includes('attendant') ? 'attendant' : 'customer';
         
-        // Fix for comparison error - redirect to admin dashboard for both admin and attendant roles
-        navigate(role === 'admin' || role === 'attendant' ? '/admin' : '/customer');
+        // Redirect to admin dashboard for both admin and attendant roles
+        navigate(role === 'admin' || role === 'attendant' ? '/admin' : '/');
       }
     } finally {
       setIsLoading(false);
@@ -45,7 +45,7 @@ const LoginPage: React.FC = () => {
           </div>
           <CardTitle className="text-2xl">Park-It Smart Valet</CardTitle>
           <CardDescription>
-            Sign in to access the valet parking system
+            Staff Login Portal
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
@@ -81,7 +81,7 @@ const LoginPage: React.FC = () => {
             <div className="bg-blue-50 p-3 rounded text-sm">
               <p className="font-semibold text-valet-blue">Demo Accounts:</p>
               <p className="mt-1">Admin: admin@parkit.com</p>
-              <p>Customer: john@example.com</p>
+              <p>Attendant: attendant@parkit.com</p>
               <p>Password: password</p>
             </div>
           </CardContent>
