@@ -9,62 +9,92 @@ interface StatisticsCardsProps {
 
 const StatisticsCards: React.FC<StatisticsCardsProps> = ({ statistics }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <Card className="shadow-sm">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <Card className="bg-gradient-to-br from-valet-blue to-blue-800 text-white">
         <CardContent className="pt-6">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-gray-600">Available Spots</p>
-              <h2 className="text-3xl font-bold mt-2">{statistics.availableSpots}</h2>
-              <p className="text-sm text-gray-500">{Math.round((statistics.availableSpots / statistics.totalSpots) * 100)}% Occupancy Rate</p>
+          <h3 className="text-lg font-medium">Occupancy Rate</h3>
+          <div className="mt-2">
+            <div className="text-3xl font-bold">
+              {Math.round((statistics.occupiedSpots / statistics.totalSpots) * 100)}%
             </div>
-            <div className="p-2 bg-blue-100 rounded-full text-blue-600">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+            <div className="text-sm mt-1">
+              {statistics.occupiedSpots} / {statistics.totalSpots} spots filled
+            </div>
+            <div className="w-full bg-white/20 h-2 rounded-full mt-3">
+              <div 
+                className="bg-white h-2 rounded-full"
+                style={{ width: `${(statistics.occupiedSpots / statistics.totalSpots) * 100}%` }}
+              />
             </div>
           </div>
         </CardContent>
       </Card>
-      
-      <Card className="shadow-sm">
+
+      <Card>
         <CardContent className="pt-6">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-gray-600">Active Vehicles</p>
-              <h2 className="text-3xl font-bold mt-2">{statistics.occupiedSpots}</h2>
-              <p className="text-sm text-gray-500">{statistics.vehiclesProcessed} Being Retrieved</p>
+          <h3 className="text-lg font-medium">Available Spots</h3>
+          <div className="mt-2">
+            <div className="text-3xl font-bold text-valet-success">
+              {statistics.availableSpots}
             </div>
-            <div className="p-2 bg-green-100 rounded-full text-green-600">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1-.9-1-1.9V7c0-.5.4-1 1-1h2"/><path d="M7 7H5c-.6 0-1 .4-1 1v3c0 .9.7 1.7 1.5 1.9C7.3 13.4 10 14 10 14s1 .9 1 1.9V17c0 .5-.4 1-1 1H8"/><path d="M14 3v3"/><path d="M14 18v3"/><path d="M3 9v6"/><path d="M21 9v6"/></svg>
+            <div className="text-sm text-muted-foreground mt-1">
+              Ready for new vehicles
             </div>
           </div>
         </CardContent>
       </Card>
-      
-      <Card className="shadow-sm">
+
+      <Card>
         <CardContent className="pt-6">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-gray-600">Completed Today</p>
-              <h2 className="text-3xl font-bold mt-2">{statistics.vehiclesProcessed}</h2>
-              <p className="text-sm text-gray-500">Total Check-outs</p>
+          <h3 className="text-lg font-medium">Vehicles Processed</h3>
+          <div className="mt-2">
+            <div className="text-3xl font-bold">
+              {statistics.vehiclesProcessed}
             </div>
-            <div className="p-2 bg-amber-100 rounded-full text-amber-600">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <div className="text-sm text-muted-foreground mt-1">
+              Total vehicles today
             </div>
           </div>
         </CardContent>
       </Card>
-      
-      <Card className="shadow-sm">
+
+      <Card>
         <CardContent className="pt-6">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-gray-600">Revenue</p>
-              <h2 className="text-3xl font-bold mt-2">${statistics.revenue.toFixed(0)}</h2>
-              <p className="text-sm text-gray-500">Daily earnings</p>
+          <h3 className="text-lg font-medium">Average Duration</h3>
+          <div className="mt-2">
+            <div className="text-3xl font-bold">
+              {statistics.averageParkingDuration} min
             </div>
-            <div className="p-2 bg-purple-100 rounded-full text-purple-600">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <div className="text-sm text-muted-foreground mt-1">
+              Average parking time
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="pt-6">
+          <h3 className="text-lg font-medium">Today's Revenue</h3>
+          <div className="mt-2">
+            <div className="text-3xl font-bold">
+              ${statistics.revenue.toFixed(2)}
+            </div>
+            <div className="text-sm text-muted-foreground mt-1">
+              Total earnings
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="bg-gradient-to-br from-valet-success to-green-700 text-white">
+        <CardContent className="pt-6">
+          <h3 className="text-lg font-medium">Performance</h3>
+          <div className="mt-2">
+            <div className="text-3xl font-bold">
+              Good
+            </div>
+            <div className="text-sm mt-1">
+              Operations running smoothly
             </div>
           </div>
         </CardContent>
