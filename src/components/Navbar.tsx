@@ -3,7 +3,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
-import { CarFront } from 'lucide-react';
+import { CarFront, Home, LayoutDashboard, Check, LogOut, User } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const { isAuthenticated, logout, user } = useAuth();
