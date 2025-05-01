@@ -1,7 +1,17 @@
 
 import express from 'express';
 import cors from 'cors';
-import { Vehicle, RetrievalRequest } from '../../types';
+import { Vehicle } from '../../types';
+
+// Define the RetrievalRequest type locally to avoid any import issues
+interface RetrievalRequest {
+  id: string;
+  vehicleId: string;
+  requestTime: Date;
+  estimatedTime: Date;
+  status: 'pending' | 'processing' | 'completed';
+  attendantId?: string;
+}
 
 const app = express();
 const PORT = 3001;

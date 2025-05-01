@@ -11,6 +11,7 @@ import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
+import VehicleRetrievalPage from "./pages/VehicleRetrievalPage";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/retrieve" element={<VehicleRetrievalPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
