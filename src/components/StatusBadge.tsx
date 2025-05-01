@@ -31,7 +31,7 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status, className }) => {
       case 'checked-in':
         return 'Checked In';
       case 'pending-retrieval':
-        return 'Pending Retrieval';
+        return 'Retrieval Requested';
       case 'retrieved':
         return 'Retrieved';
       default:

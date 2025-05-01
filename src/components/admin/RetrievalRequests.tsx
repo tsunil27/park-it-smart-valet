@@ -73,7 +73,7 @@ const RetrievalRequests: React.FC<RetrievalRequestsProps> = ({ requests, onProce
                       <span>ETA: {formatTimeLeft(request.estimatedTime)}</span>
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      Status: {vehicle.status === 'pending-retrieval' ? 'Pending Retrieval' : vehicle.status}
+                      Status: {vehicle.status === 'pending-retrieval' ? 'Retrieval Requested' : vehicle.status}
                     </div>
                   </div>
                   
