@@ -24,7 +24,7 @@ const VehicleRetrievalPage: React.FC = () => {
     
     try {
       // Simulate API call to check vehicle details
-      const foundVehicle = mockVehicles.find(
+      const foundVehicleIndex = mockVehicles.findIndex(
         v => v.licensePlate.toLowerCase() === licensePlate.toLowerCase() && 
              v.ownerPhone === phoneNumber &&
              v.status === 'checked-in'
@@ -33,12 +33,26 @@ const VehicleRetrievalPage: React.FC = () => {
       // Simulate network delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      if (foundVehicle) {
+      if (foundVehicleIndex !== -1) {
+        const foundVehicle = mockVehicles[foundVehicleIndex];
+        
         // Calculate estimated time (5 minutes from now)
         const eta = new Date();
         eta.setMinutes(eta.getMinutes() + 5);
         setEstimatedTime(eta);
-        setVehicle(foundVehicle);
+        
+        // Update vehicle status to pending-retrieval
+        mockVehicles[foundVehicleIndex] = {
+          ...foundVehicle,
+          status: 'pending-retrieval'
+        };
+        
+        // Update the vehicle state with the updated status
+        setVehicle({
+          ...foundVehicle,
+          status: 'pending-retrieval'
+        });
+        
         setRetrievalStatus('success');
         
         // Create retrieval request
@@ -52,6 +66,7 @@ const VehicleRetrievalPage: React.FC = () => {
         
         // In a real app, we would send this to the backend
         console.log('Created retrieval request:', newRequest);
+        console.log('Updated vehicle status to pending-retrieval:', mockVehicles[foundVehicleIndex]);
         
         toast.success("Your vehicle retrieval request has been submitted", {
           description: "Your car will be ready shortly"

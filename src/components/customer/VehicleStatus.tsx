@@ -36,6 +36,8 @@ const VehicleStatus: React.FC<VehicleStatusProps> = ({
     return `${mins} minutes`;
   };
 
+  const isPendingRetrieval = vehicle.status === 'pending-retrieval';
+
   return (
     <Card className="w-full max-w-md mx-auto animate-fade-in">
       <CardHeader className="pb-4">
@@ -80,7 +82,7 @@ const VehicleStatus: React.FC<VehicleStatusProps> = ({
             </div>
           </div>
           
-          {retrievalRequested && estimatedTime && (
+          {(retrievalRequested || isPendingRetrieval) && estimatedTime && (
             <div className="bg-valet-blue/10 p-4 rounded-lg mt-4 animate-fade-in">
               <h3 className="font-medium text-valet-blue mb-1">Retrieval Requested</h3>
               <p className="text-sm">
@@ -93,7 +95,7 @@ const VehicleStatus: React.FC<VehicleStatusProps> = ({
             </div>
           )}
 
-          {!retrievalRequested && vehicle.status === 'checked-in' && (
+          {!retrievalRequested && !isPendingRetrieval && vehicle.status === 'checked-in' && (
             <Button 
               onClick={onRequestRetrieval} 
               className="w-full mt-4 bg-valet-blue hover:bg-valet-blue/90"
