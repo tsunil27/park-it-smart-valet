@@ -48,6 +48,14 @@ let mockVehicles: Vehicle[] = [
 app.use(cors());
 app.use(express.json());
 
+// NEW API endpoint to get all vehicles and their status
+app.get('/api/vehicles', (req, res) => {
+  return res.status(200).json({
+    success: true,
+    data: mockVehicles
+  });
+});
+
 // API endpoint to handle vehicle retrieval requests
 app.post('/api/retrieval', (req, res) => {
   const { licensePlate, phoneNumber } = req.body;
