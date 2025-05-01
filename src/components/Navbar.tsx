@@ -38,11 +38,6 @@ const Navbar: React.FC = () => {
               </>
             ) : (
               <div className="flex space-x-2">
-                <Link to="/retrieve">
-                  <Button variant="outline" size="sm">
-                    Retrieve Vehicle
-                  </Button>
-                </Link>
                 <Link to="/login">
                   <Button variant="outline" size="sm">
                     Staff Login

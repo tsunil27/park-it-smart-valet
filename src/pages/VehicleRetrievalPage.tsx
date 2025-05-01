@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,8 @@ import { Label } from '@/components/ui/label';
 import { CarFront, Phone, Search } from 'lucide-react';
 import { mockVehicles } from '@/data/mockData';
 import { toast } from 'sonner';
-import { Vehicle, RetrievalRequest } from '@/types';
+import { Vehicle } from '@/types';
+import { requestVehicleRetrieval } from '@/services/retrievalService';
 
 const VehicleRetrievalPage: React.FC = () => {
   const [licensePlate, setLicensePlate] = useState('');
@@ -23,50 +23,13 @@ const VehicleRetrievalPage: React.FC = () => {
     setRetrievalStatus('idle');
     
     try {
-      // Simulate API call to check vehicle details
-      const foundVehicleIndex = mockVehicles.findIndex(
-        v => v.licensePlate.toLowerCase() === licensePlate.toLowerCase() && 
-             v.ownerPhone === phoneNumber &&
-             v.status === 'checked-in'
-      );
+      // Call the retrieval service API
+      const response = await requestVehicleRetrieval(licensePlate, phoneNumber);
       
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      if (foundVehicleIndex !== -1) {
-        const foundVehicle = mockVehicles[foundVehicleIndex];
-        
-        // Calculate estimated time (5 minutes from now)
-        const eta = new Date();
-        eta.setMinutes(eta.getMinutes() + 5);
-        setEstimatedTime(eta);
-        
-        // Update vehicle status to pending-retrieval
-        mockVehicles[foundVehicleIndex] = {
-          ...foundVehicle,
-          status: 'pending-retrieval'
-        };
-        
-        // Update the vehicle state with the updated status
-        setVehicle({
-          ...foundVehicle,
-          status: 'pending-retrieval'
-        });
-        
+      if (response.success) {
+        setVehicle(response.data.vehicle);
+        setEstimatedTime(new Date(response.data.estimatedTime));
         setRetrievalStatus('success');
-        
-        // Create retrieval request
-        const newRequest: RetrievalRequest = {
-          id: `req-${Date.now()}`,
-          vehicleId: foundVehicle.id,
-          requestTime: new Date(),
-          estimatedTime: eta,
-          status: 'pending'
-        };
-        
-        // In a real app, we would send this to the backend
-        console.log('Created retrieval request:', newRequest);
-        console.log('Updated vehicle status to pending-retrieval:', mockVehicles[foundVehicleIndex]);
         
         toast.success("Your vehicle retrieval request has been submitted", {
           description: "Your car will be ready shortly"
@@ -77,6 +40,12 @@ const VehicleRetrievalPage: React.FC = () => {
           description: "Please check your license plate and phone number"
         });
       }
+    } catch (error) {
+      console.error('Error during retrieval request:', error);
+      setRetrievalStatus('error');
+      toast.error("Vehicle not found", {
+        description: "Please check your license plate and phone number or try again later"
+      });
     } finally {
       setIsLoading(false);
     }
