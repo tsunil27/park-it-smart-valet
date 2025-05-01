@@ -10,6 +10,7 @@ import Navbar from "./components/Navbar";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import AdminDashboard from "./pages/AdminDashboard";
+import CustomerDashboard from "./pages/CustomerDashboard";
 import NotFound from "./pages/NotFound";
 import VehicleRetrievalPage from "./pages/VehicleRetrievalPage";
 
@@ -27,6 +28,7 @@ const App = () => (
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/customer" element={<CustomerDashboard />} />
             <Route path="/retrieve" element={<VehicleRetrievalPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

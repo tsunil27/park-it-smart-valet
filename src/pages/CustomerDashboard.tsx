@@ -6,8 +6,9 @@ import VehicleStatus from '@/components/customer/VehicleStatus';
 import VehicleTicket from '@/components/customer/VehicleTicket';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Vehicle, RetrievalRequest } from '@/types';
-import { mockVehicles } from '@/data/mockData';
 import { toast } from 'sonner';
+import { useQuery } from '@tanstack/react-query';
+import { getVehicles } from '@/services/vehicleService';
 
 const CustomerDashboard: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
@@ -15,20 +16,57 @@ const CustomerDashboard: React.FC = () => {
   const [retrievalRequested, setRetrievalRequested] = useState(false);
   const [estimatedTime, setEstimatedTime] = useState<Date | undefined>(undefined);
 
+  // Fetch vehicles using React Query
+  const { data: vehicles, isLoading, error } = useQuery({
+    queryKey: ['vehicles'],
+    queryFn: getVehicles
+  });
+
   useEffect(() => {
-    // In a real app, we would fetch the vehicle for the logged-in user
-    // For demo purposes, we're using the first vehicle from mock data
-    if (user) {
-      const vehicle = mockVehicles.find(v => v.status !== 'retrieved');
+    // When vehicles data is loaded, find the first non-retrieved vehicle for the user
+    if (vehicles && user) {
+      const vehicle = vehicles.find(v => v.status !== 'retrieved');
       if (vehicle) {
         setUserVehicle(vehicle);
       }
     }
-  }, [user]);
+  }, [vehicles, user]);
 
   // If not logged in, redirect to login
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="container mx-auto py-10 px-4">
+        <Card className="max-w-md mx-auto">
+          <CardHeader>
+            <CardTitle>Loading...</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>Fetching your vehicle information...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="container mx-auto py-10 px-4">
+        <Card className="max-w-md mx-auto border-red-300">
+          <CardHeader>
+            <CardTitle>Error</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>There was a problem fetching your vehicle information. Please try again later.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   // If no vehicle found for user
