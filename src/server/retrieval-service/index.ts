@@ -1,11 +1,38 @@
 
 import express from 'express';
 import cors from 'cors';
-import { mockVehicles } from '@/data/mockData';
-import { RetrievalRequest } from '@/types';
+import { Vehicle, RetrievalRequest } from '../../types';
 
 const app = express();
 const PORT = 3001;
+
+// Mock data - in a real app, this would come from a database
+let mockVehicles: Vehicle[] = [
+  {
+    id: 'v1',
+    licensePlate: 'ABC123',
+    make: 'Toyota',
+    model: 'Camry',
+    color: 'Blue',
+    ownerName: 'John Smith',
+    ownerPhone: '555-1234',
+    parkingSpot: 'A1',
+    status: 'checked-in',
+    checkInTime: new Date(),
+  },
+  {
+    id: 'v2',
+    licensePlate: 'XYZ789',
+    make: 'Honda',
+    model: 'Accord',
+    color: 'Red',
+    ownerName: 'Jane Doe',
+    ownerPhone: '555-5678',
+    parkingSpot: 'B2',
+    status: 'checked-in',
+    checkInTime: new Date(),
+  }
+];
 
 // Middleware
 app.use(cors());
