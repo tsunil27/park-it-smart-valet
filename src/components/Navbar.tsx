@@ -3,10 +3,10 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
-import { CarFront, Home, LayoutDashboard, Check, LogOut, User } from 'lucide-react';
+import { CarFront, Home, LayoutDashboard, PlusCircle, LogOut, User } from 'lucide-react';
 
 const Navbar: React.FC = () => {
-  const { isAuthenticated, logout, user } = useAuth();
+  const { isAuthenticated, logout, user, role } = useAuth();
   const location = useLocation();
 
   return (
@@ -21,26 +21,64 @@ const Navbar: React.FC = () => {
           <div className="flex items-center space-x-4">
             {isAuthenticated ? (
               <>
-                {user?.role === 'admin' || user?.role === 'attendant' ? (
-                  <div className="flex space-x-4">
+                {/* Admin and attendant links */}
+                {(role === 'admin' || role === 'attendant') && (
+                  <div className="flex space-x-2">
                     <Link to="/admin">
-                      <Button variant={location.pathname.includes('/admin') ? "secondary" : "ghost"}>
-                        Dashboard
+                      <Button 
+                        variant={location.pathname === '/admin' ? "secondary" : "ghost"} 
+                        size="sm"
+                      >
+                        <LayoutDashboard className="mr-1 h-4 w-4" />
+                        <span className="hidden md:inline">Dashboard</span>
+                      </Button>
+                    </Link>
+                    <Link to="/checkin">
+                      <Button 
+                        variant={location.pathname === '/checkin' ? "secondary" : "ghost"} 
+                        size="sm"
+                      >
+                        <PlusCircle className="mr-1 h-4 w-4" />
+                        <span className="hidden md:inline">Check In</span>
                       </Button>
                     </Link>
                   </div>
-                ) : null}
+                )}
+                
+                {/* Customer links */}
+                {role === 'customer' && (
+                  <Link to="/customer">
+                    <Button 
+                      variant={location.pathname === '/customer' ? "secondary" : "ghost"} 
+                      size="sm"
+                    >
+                      <User className="mr-1 h-4 w-4" />
+                      <span className="hidden md:inline">My Vehicle</span>
+                    </Button>
+                  </Link>
+                )}
                 
                 <span className="text-sm hidden md:inline">Welcome, {user?.name}</span>
                 <Button variant="outline" size="sm" onClick={logout}>
-                  Logout
+                  <LogOut className="mr-1 h-4 w-4" />
+                  <span className="hidden md:inline">Logout</span>
                 </Button>
               </>
             ) : (
               <div className="flex space-x-2">
+                <Link to="/">
+                  <Button 
+                    variant={location.pathname === '/' ? "secondary" : "ghost"}
+                    size="sm"
+                  >
+                    <Home className="mr-1 h-4 w-4" />
+                    <span>Home</span>
+                  </Button>
+                </Link>
                 <Link to="/login">
                   <Button variant="outline" size="sm">
-                    Staff Login
+                    <User className="mr-1 h-4 w-4" />
+                    <span>Login</span>
                   </Button>
                 </Link>
               </div>
