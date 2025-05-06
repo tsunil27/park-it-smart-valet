@@ -1,5 +1,4 @@
 
-import { Vehicle } from '../../types';
 import express from 'express';
 import cors from 'cors';
 
@@ -11,7 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 // Sample data (in a real app, this would come from a database)
-const vehicles: Vehicle[] = [
+const vehicles = [
   {
     id: 'v001',
     licensePlate: 'ABC123',
@@ -129,4 +128,3 @@ app.post('/api/retrieval', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Retrieval service running on http://localhost:${PORT}`);
 });
-

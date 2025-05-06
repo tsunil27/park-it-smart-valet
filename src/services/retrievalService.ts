@@ -16,3 +16,23 @@ export const requestVehicleRetrieval = async (licensePlate: string, phoneNumber:
     throw error;
   }
 };
+
+export const getVehicles = async (): Promise<Vehicle[]> => {
+  try {
+    const response = await axios.get(`${API_URL}/vehicles`);
+    return response.data.data;
+  } catch (error) {
+    console.error('Error fetching vehicles:', error);
+    throw error;
+  }
+};
+
+export const getVehicleByLicensePlate = async (licensePlate: string): Promise<Vehicle | null> => {
+  try {
+    const response = await axios.get(`${API_URL}/vehicles/${licensePlate}`);
+    return response.data.data;
+  } catch (error) {
+    console.error(`Error fetching vehicle with license plate ${licensePlate}:`, error);
+    return null;
+  }
+};
