@@ -36,3 +36,23 @@ export const getVehicleByLicensePlate = async (licensePlate: string): Promise<Ve
     return null;
   }
 };
+
+export const checkInVehicle = async (vehicleData: Partial<Vehicle>): Promise<Vehicle> => {
+  try {
+    const response = await axios.post(`${API_URL}/vehicles`, vehicleData);
+    return response.data.data;
+  } catch (error) {
+    console.error('Error checking in vehicle:', error);
+    throw error;
+  }
+};
+
+export const updateVehicleStatus = async (id: string, status: Vehicle['status']): Promise<Vehicle> => {
+  try {
+    const response = await axios.patch(`${API_URL}/vehicles/${id}/status`, { status });
+    return response.data.data;
+  } catch (error) {
+    console.error(`Error updating vehicle status for ${id}:`, error);
+    throw error;
+  }
+};

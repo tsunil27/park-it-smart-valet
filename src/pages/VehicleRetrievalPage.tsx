@@ -1,54 +1,45 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CarFront, Phone, Search } from 'lucide-react';
-import { mockVehicles } from '@/data/mockData';
 import { toast } from 'sonner';
 import { Vehicle } from '@/types';
-import { requestVehicleRetrieval } from '@/services/retrievalService';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { requestVehicleRetrieval, getVehicleByLicensePlate } from '@/services/retrievalService';
 
 const VehicleRetrievalPage: React.FC = () => {
   const [licensePlate, setLicensePlate] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [retrievalStatus, setRetrievalStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const [vehicle, setVehicle] = useState<Vehicle | null>(null);
+  const [retrievalRequested, setRetrievalRequested] = useState(false);
   const [estimatedTime, setEstimatedTime] = useState<Date | null>(null);
+  const [vehicle, setVehicle] = useState<Vehicle | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setRetrievalStatus('idle');
-    
-    try {
-      // Call the retrieval service API
-      const response = await requestVehicleRetrieval(licensePlate, phoneNumber);
-      
-      if (response.success) {
-        setVehicle(response.data.vehicle);
-        setEstimatedTime(new Date(response.data.estimatedTime));
-        setRetrievalStatus('success');
+  const retrievalMutation = useMutation({
+    mutationFn: () => requestVehicleRetrieval(licensePlate, phoneNumber),
+    onSuccess: (data) => {
+      if (data.success) {
+        setVehicle(data.data.vehicle);
+        setEstimatedTime(new Date(data.data.estimatedTime));
+        setRetrievalRequested(true);
         
         toast.success("Your vehicle retrieval request has been submitted", {
           description: "Your car will be ready shortly"
         });
-      } else {
-        setRetrievalStatus('error');
-        toast.error("Vehicle not found", {
-          description: "Please check your license plate and phone number"
-        });
       }
-    } catch (error) {
-      console.error('Error during retrieval request:', error);
-      setRetrievalStatus('error');
+    },
+    onError: () => {
       toast.error("Vehicle not found", {
         description: "Please check your license plate and phone number or try again later"
       });
-    } finally {
-      setIsLoading(false);
     }
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    retrievalMutation.mutate();
   };
 
   const formatTime = (date: Date) => {
@@ -68,7 +59,7 @@ const VehicleRetrievalPage: React.FC = () => {
           </CardDescription>
         </CardHeader>
         
-        {retrievalStatus !== 'success' ? (
+        {!retrievalRequested ? (
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -100,7 +91,7 @@ const VehicleRetrievalPage: React.FC = () => {
                 </div>
               </div>
               
-              {retrievalStatus === 'error' && (
+              {retrievalMutation.isError && (
                 <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded text-sm">
                   <p>We couldn't find a vehicle matching these details. Please check your information or contact the valet desk for assistance.</p>
                 </div>
@@ -111,9 +102,9 @@ const VehicleRetrievalPage: React.FC = () => {
               <Button
                 type="submit"
                 className="w-full bg-valet-blue hover:bg-valet-blue/90 flex items-center justify-center gap-2"
-                disabled={isLoading}
+                disabled={retrievalMutation.isPending}
               >
-                {isLoading ? (
+                {retrievalMutation.isPending ? (
                   <>Processing...</>
                 ) : (
                   <>
@@ -156,7 +147,7 @@ const VehicleRetrievalPage: React.FC = () => {
               variant="outline"
               className="w-full"
               onClick={() => {
-                setRetrievalStatus('idle');
+                setRetrievalRequested(false);
                 setVehicle(null);
                 setLicensePlate('');
                 setPhoneNumber('');

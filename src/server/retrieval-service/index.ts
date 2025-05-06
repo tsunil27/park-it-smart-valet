@@ -1,16 +1,17 @@
 
 import express from 'express';
 import cors from 'cors';
+import { Vehicle } from '../../types';
 
 const app = express();
 const PORT = 3001;
 
-// Enable CORS and JSON parsing
+// Middleware
 app.use(cors());
 app.use(express.json());
 
 // Sample data (in a real app, this would come from a database)
-const vehicles = [
+const vehicles: Vehicle[] = [
   {
     id: 'v001',
     licensePlate: 'ABC123',
@@ -21,40 +22,48 @@ const vehicles = [
     ownerPhone: '555-123-4567',
     parkingSpot: 'A1',
     status: 'checked-in',
-    checkInTime: new Date(Date.now() - 3600000), // 1 hour ago
-    notes: 'Scratch on rear bumper'
+    checkInTime: new Date('2023-04-29T10:30:00'),
+    notes: 'Keys in ignition'
   },
   {
     id: 'v002',
     licensePlate: 'XYZ789',
     make: 'Honda',
-    model: 'Civic',
-    color: 'Blue',
+    model: 'Accord',
+    color: 'Black',
     ownerName: 'Jane Smith',
     ownerPhone: '555-987-6543',
     parkingSpot: 'B3',
-    status: 'pending-retrieval',
-    checkInTime: new Date(Date.now() - 7200000), // 2 hours ago
-    retrievalTime: new Date(Date.now() + 600000), // 10 minutes from now
-    notes: 'Keys in ignition'
+    status: 'checked-in',
+    checkInTime: new Date('2023-04-29T11:15:00'),
+    notes: 'Scratch on passenger door'
   },
   {
     id: 'v003',
     licensePlate: 'DEF456',
     make: 'Tesla',
     model: 'Model 3',
-    color: 'Red',
-    ownerName: 'Sam Wilson',
-    ownerPhone: '555-555-5555',
+    color: 'White',
+    ownerName: 'Robert Johnson',
+    ownerPhone: '555-456-7890',
     parkingSpot: 'C2',
-    status: 'retrieved',
-    checkInTime: new Date(Date.now() - 10800000), // 3 hours ago
-    retrievalTime: new Date(Date.now() - 1800000), // 30 minutes ago
-    notes: 'EV - requires charging'
+    status: 'pending-retrieval',
+    checkInTime: new Date('2023-04-29T09:45:00'),
+    notes: 'Electric vehicle'
   }
 ];
 
-// API endpoint to get all vehicles
+// Retrieval requests
+const retrievalRequests: {
+  id: string;
+  licensePlate: string;
+  phoneNumber: string;
+  requestTime: Date;
+  estimatedTime: Date;
+  status: 'pending' | 'processing' | 'completed';
+}[] = [];
+
+// GET /api/vehicles - Get all vehicles
 app.get('/api/vehicles', (req, res) => {
   res.json({
     success: true,
@@ -62,35 +71,75 @@ app.get('/api/vehicles', (req, res) => {
   });
 });
 
-// API endpoint to get a specific vehicle by license plate
+// GET /api/vehicles/:licensePlate - Get vehicle by license plate
 app.get('/api/vehicles/:licensePlate', (req, res) => {
   const { licensePlate } = req.params;
   const vehicle = vehicles.find(v => v.licensePlate.toLowerCase() === licensePlate.toLowerCase());
   
-  if (vehicle) {
-    res.json({
-      success: true,
-      data: vehicle
-    });
-  } else {
-    res.status(404).json({
+  if (!vehicle) {
+    return res.status(404).json({
       success: false,
-      message: 'Vehicle not found'
+      message: `Vehicle with license plate ${licensePlate} not found`
     });
   }
+  
+  res.json({
+    success: true,
+    data: vehicle
+  });
 });
 
-// API endpoint for vehicle retrieval requests
+// POST /api/vehicles - Check in a new vehicle
+app.post('/api/vehicles', (req, res) => {
+  const vehicleData = req.body;
+  
+  // Generate a unique ID
+  const newVehicle: Vehicle = {
+    ...vehicleData,
+    id: `v${Date.now()}`,
+    status: 'checked-in',
+    checkInTime: new Date()
+  };
+  
+  vehicles.push(newVehicle);
+  
+  res.status(201).json({
+    success: true,
+    data: newVehicle
+  });
+});
+
+// PATCH /api/vehicles/:id/status - Update vehicle status
+app.patch('/api/vehicles/:id/status', (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  
+  const vehicleIndex = vehicles.findIndex(v => v.id === id);
+  
+  if (vehicleIndex === -1) {
+    return res.status(404).json({
+      success: false,
+      message: `Vehicle with ID ${id} not found`
+    });
+  }
+  
+  vehicles[vehicleIndex] = {
+    ...vehicles[vehicleIndex],
+    status,
+    retrievalTime: status === 'retrieved' ? new Date() : vehicles[vehicleIndex].retrievalTime
+  };
+  
+  res.json({
+    success: true,
+    data: vehicles[vehicleIndex]
+  });
+});
+
+// POST /api/retrieval - Request vehicle retrieval
 app.post('/api/retrieval', (req, res) => {
   const { licensePlate, phoneNumber } = req.body;
   
-  if (!licensePlate || !phoneNumber) {
-    return res.status(400).json({
-      success: false,
-      message: 'License plate and phone number are required'
-    });
-  }
-  
+  // Find the vehicle
   const vehicle = vehicles.find(v => 
     v.licensePlate.toLowerCase() === licensePlate.toLowerCase() && 
     v.ownerPhone === phoneNumber
@@ -99,32 +148,43 @@ app.post('/api/retrieval', (req, res) => {
   if (!vehicle) {
     return res.status(404).json({
       success: false,
-      message: 'No matching vehicle found'
+      message: 'Vehicle not found or phone number does not match'
     });
   }
   
-  if (vehicle.status === 'retrieved') {
-    return res.status(400).json({
-      success: false,
-      message: 'Vehicle has already been retrieved'
-    });
-  }
+  // Create retrieval request
+  const requestTime = new Date();
+  const estimatedTime = new Date(requestTime);
+  estimatedTime.setMinutes(estimatedTime.getMinutes() + 5); // 5 minutes ETA
+  
+  const retrievalRequest = {
+    id: `req-${Date.now()}`,
+    licensePlate,
+    phoneNumber,
+    requestTime,
+    estimatedTime,
+    status: 'pending' as const
+  };
+  
+  retrievalRequests.push(retrievalRequest);
   
   // Update vehicle status
-  vehicle.status = 'pending-retrieval';
-  vehicle.retrievalTime = new Date(Date.now() + 300000); // 5 minutes from now
+  const vehicleIndex = vehicles.findIndex(v => v.id === vehicle.id);
+  vehicles[vehicleIndex] = {
+    ...vehicles[vehicleIndex],
+    status: 'pending-retrieval'
+  };
   
-  return res.json({
+  res.json({
     success: true,
-    message: 'Vehicle retrieval requested',
     data: {
-      vehicle,
-      estimatedTime: vehicle.retrievalTime
+      vehicle: vehicles[vehicleIndex],
+      estimatedTime
     }
   });
 });
 
-// Start the server
+// Start server
 app.listen(PORT, () => {
   console.log(`Retrieval service running on http://localhost:${PORT}`);
 });
